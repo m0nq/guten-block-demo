@@ -10,8 +10,9 @@ import './style.scss';
 import './editor.scss';
 import icon from './icon';
 
-const { __ } = wp.i18n; // Import __() from wp.i18n
-const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
+const { __ } = wp.i18n;
+const { registerBlockType } = wp.blocks;
+const { RichText } = wp.editor;
 
 /**
  * Register: aa Gutenberg Block.
@@ -30,50 +31,56 @@ registerBlockType( 'crt/block-guten-block-demo', {
 	title: __( 'Example - Block', 'cirquitree' ), // Block title.
 	description: __( 'Demo for working with and understanding Gutenberg blocks for WP', 'cirquitree' ),
 	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
-	icon: icon, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+	icon: {
+		background: 'rgba(254, 243, 224, 0.52)',
+		src: icon,
+	}, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
 	keywords: [
 		__( 'Banner', 'cirquitree' ),
 		__( 'CTR', 'cirquitree' ),
+		__( 'Message', 'cirquitree' ),
 	],
 
-	/**
-	 * The edit function describes the structure of your block in the context of the editor.
-	 * This represents what the editor will render when the block is used.
-	 *
-	 * The "edit" property must be a valid function.
-	 *
-	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
-	 * @returns a block for the editor
-	 */
+	attributes: {
+		message: {
+			type: 'array',
+			source: 'children',
+			selector: '.message-body',
+		},
+	},
+
 	edit: props => {
-		const { className, isSelected } = props;
+		const { attributes: { message }, className, setAttributes } = props;
+		console.log( 'Output of props.message is -> ', message );
+
+		const onChangeMessage = message => {
+			setAttributes( { message } );
+		};
+
 		return (
 			<div className={ className }>
-				<h2>{ __( 'Static Call to Action', 'cirquitree' ) }</h2>
-				<p>{ __( 'This is really important!' ) }</p>
-				{
-					isSelected && <p className="sorry warning">{ __( 'Sorry! You can\'t edit this block' ) }</p>
-				}
+				<h2>{ __( 'Call to Action', 'jsforwpblocks' ) }</h2>
+				<RichText
+					tagName="div"
+					multiline="p"
+					placeholder={ __( 'Add your custom message', 'jsforwpblocks' ) }
+					onChange={ newValue => setAttributes( { message: newValue } ) }
+					value={ message }
+				/>
 			</div>
 		);
 	},
 
-	/**
-	 * The save function defines the way in which the different attributes should be combined
-	 * into the final markup, which is then serialized by Gutenberg into post_content.
-	 *
-	 * The "save" property must be specified and must be a valid function.
-	 *
-	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
-	 * @returns markup for front end
-	 */
 	save: props => {
+		const { attributes: { message } } = props;
 		return (
 			<div>
-				<h2>{ __( 'Call to Action', 'cirquitree' ) }</h2>
-				<p>{ __( 'This is really important!', 'cirquitree' ) }</p>
+				<h2>{ __( 'Call to Action', 'jsforwpblocks' ) }</h2>
+				<div className="message-body">
+					{ message }
+				</div>
 			</div>
 		);
 	},
-} )
-;
+},
+);
