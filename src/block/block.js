@@ -8,6 +8,7 @@
 //  Import CSS.
 import './style.scss';
 import './editor.scss';
+import icon from './icon';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
@@ -22,18 +23,17 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
  * @link https://wordpress.org/gutenberg/handbook/block-api/
  * @param  {string}   name     Block name.
  * @param  {Object}   settings Block settings.
- * @return {?WPBlock}          The block, if it has been successfully
+ * @returns {?WPBlock}          The block, if it has been successfully
  *                             registered; otherwise `undefined`.
  */
-registerBlockType( 'cgb/block-guten-block-demo', {
-	// Block name. Block names must be string that contains a namespace prefix. Example: my-plugin/my-custom-block.
-	title: __( 'guten-block-demo - CGB Block' ), // Block title.
-	icon: 'shield', // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+registerBlockType( 'crt/block-guten-block-demo', {
+	title: __( 'Example - Block', 'cirquitree' ), // Block title.
+	description: __( 'Demo for working with and understanding Gutenberg blocks for WP', 'cirquitree' ),
 	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
+	icon: icon, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
 	keywords: [
-		__( 'guten-block-demo — CGB Block' ),
-		__( 'CGB Example' ),
-		__( 'create-guten-block' ),
+		__( 'Banner', 'cirquitree' ),
+		__( 'CTR', 'cirquitree' ),
 	],
 
 	/**
@@ -43,23 +43,17 @@ registerBlockType( 'cgb/block-guten-block-demo', {
 	 * The "edit" property must be a valid function.
 	 *
 	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
+	 * @returns a block for the editor
 	 */
-	edit: function( props ) {
-		// Creates a <p class='wp-block-cgb-block-guten-block-demo'></p>.
+	edit: props => {
+		const { className, isSelected } = props;
 		return (
-			<div className={ props.className }>
-				<p>— Hello from the backend.</p>
-				<p>
-					CGB BLOCK: <code>guten-block-demo</code> is a new Gutenberg block
-				</p>
-				<p>
-					It was created via{ ' ' }
-					<code>
-						<a href="https://github.com/ahmadawais/create-guten-block">
-							create-guten-block
-						</a>
-					</code>.
-				</p>
+			<div className={ className }>
+				<h2>{ __( 'Static Call to Action', 'cirquitree' ) }</h2>
+				<p>{ __( 'This is really important!' ) }</p>
+				{
+					isSelected && <p className="sorry warning">{ __( 'Sorry! You can\'t edit this block' ) }</p>
+				}
 			</div>
 		);
 	},
@@ -71,23 +65,15 @@ registerBlockType( 'cgb/block-guten-block-demo', {
 	 * The "save" property must be specified and must be a valid function.
 	 *
 	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
+	 * @returns markup for front end
 	 */
-	save: function( props ) {
+	save: props => {
 		return (
 			<div>
-				<p>— Hello from the frontend.</p>
-				<p>
-					CGB BLOCK: <code>guten-block-demo</code> is a new Gutenberg block.
-				</p>
-				<p>
-					It was created via{ ' ' }
-					<code>
-						<a href="https://github.com/ahmadawais/create-guten-block">
-							create-guten-block
-						</a>
-					</code>.
-				</p>
+				<h2>{ __( 'Call to Action', 'cirquitree' ) }</h2>
+				<p>{ __( 'This is really important!', 'cirquitree' ) }</p>
 			</div>
 		);
 	},
-} );
+} )
+;
