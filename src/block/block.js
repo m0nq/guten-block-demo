@@ -15,6 +15,7 @@ const {
 	RichText,
 	AlignmentToolbar,
 	BlockControls,
+	BlockAlignmentToolbar,
 } = wp.editor;
 
 /**
@@ -31,66 +32,86 @@ const {
  *                             registered; otherwise `undefined`.
  */
 registerBlockType( 'crt/block-guten-block-demo', {
-	title: __( 'Example - Block', 'cirquitree' ), // Block title.
-	description: __( 'Demo for working with and understanding Gutenberg blocks for WP', 'cirquitree' ),
-	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
-	icon: {
-		background: 'rgba(254, 243, 224, 0.52)',
-		src: 'editor-alignleft',
-	}, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
-	keywords: [
-		__( 'Banner', 'cirquitree' ),
-		__( 'CTR', 'cirquitree' ),
-		__( 'Message', 'cirquitree' ),
-	],
+		title: __( 'Example - Block', 'cirquitree' ), // Block title.
+		description: __( 'Demo for working with and understanding Gutenberg blocks for WP', 'cirquitree' ),
+		category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
+		icon: {
+			background: 'rgba(254, 243, 224, 0.52)',
+			src: 'align-none',
+		}, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+		keywords: [
+			__( 'Banner', 'cirquitree' ),
+			__( 'CTR', 'cirquitree' ),
+			__( 'Message', 'cirquitree' ),
+		],
 
-	attributes: {
-		message: {
-			type: 'array',
-			source: 'children',
-			selector: '.message-body',
+		attributes: {
+			message: {
+				type: 'array',
+				source: 'children',
+				selector: '.message-body',
+			},
+			textAlignment: {
+				type: 'string',
+			},
+			blockAlignment: {
+				type: 'string',
+				default: 'wide',
+			},
 		},
-		textAlignment: {
-			type: 'string',
+
+		getEditWrapperProps( { blockAlignment } ) {
+			if ('left' === blockAlignment || 'right' === blockAlignment || 'full' === blockAlignment) {
+				return { 'data-align': blockAlignment };
+			}
 		},
-	},
 
-	edit: props => {
-		const {
-			attributes: { textAlignment, message },
-			className, setAttributes, isSelected,
-		} = props;
+		edit: props => {
+			const {
+				attributes: {
+					textAlignment,
+					blockAlignment,
+					message,
+				}, className,
+				setAttributes,
+			} = props;
 
-		console.log( textAlignment );
-
-		return (
-			<div className={ className }>
-				{ isSelected &&
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlignment }
-						onChange={ newValue => setAttributes( { textAlignment: newValue } ) }
+			return (
+				<div className={className}>
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={blockAlignment}
+							onChange={newValue => setAttributes( { blockAlignment: newValue } )}
+						/>
+						<AlignmentToolbar
+							value={textAlignment}
+							onChange={newValue => setAttributes( { textAlignment: newValue } )}
+						/>
+					</BlockControls>
+					<RichText
+						tagName="div"
+						multiline="p"
+						placeholder={__( 'Enter your message here..', 'cirquitree' )}
+						value={message}
+						style={{ textAlign: textAlignment }}
 					/>
-				</BlockControls>
-				}
-				<RichText
-					tagName="div"
-					multiline="p"
-					placeholder={ __( 'Enter your message here..', 'jsforwpblocks' ) }
-					value={ message }
-					style={ { textAlign: textAlignment } }
-					onChange={ message => setAttributes( { message } ) }
-				/>
-			</div>
-		);
-	},
+				</div>
+			);
+		},
 
-	save: props => {
-		const { textAlignment, message } = props.attributes;
-		return (
-			<div className="message-body" style={ { textAlign: textAlignment } }>
-				{ message }
-			</div>
-		);
+		save: props => {
+			const { blockAlignment, textAlignment, message } = props.attributes;
+			return (
+				<div
+					className={classnames(
+						`align${ blockAlignment }`,
+						'message-body',
+					)}
+					style={{ textAlign: textAlignment }}
+				>
+					{message}
+				</div>
+			);
+		},
 	},
-} );
+);
