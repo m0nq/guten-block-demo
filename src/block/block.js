@@ -6,13 +6,16 @@
  */
 
 //  Import CSS.
+import classnames from 'classnames';
 import './style.scss';
-import './editor.scss';
-import icon from './icon';
 
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+const {
+	RichText,
+	AlignmentToolbar,
+	BlockControls,
+} = wp.editor;
 
 /**
  * Register: aa Gutenberg Block.
@@ -33,7 +36,7 @@ registerBlockType( 'crt/block-guten-block-demo', {
 	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
 	icon: {
 		background: 'rgba(254, 243, 224, 0.52)',
-		src: icon,
+		src: 'editor-alignleft',
 	}, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
 	keywords: [
 		__( 'Banner', 'cirquitree' ),
@@ -47,40 +50,47 @@ registerBlockType( 'crt/block-guten-block-demo', {
 			source: 'children',
 			selector: '.message-body',
 		},
+		textAlignment: {
+			type: 'string',
+		},
 	},
 
 	edit: props => {
-		const { attributes: { message }, className, setAttributes } = props;
-		console.log( 'Output of props.message is -> ', message );
+		const {
+			attributes: { textAlignment, message },
+			className, setAttributes, isSelected,
+		} = props;
 
-		const onChangeMessage = message => {
-			setAttributes( { message } );
-		};
+		console.log( textAlignment );
 
 		return (
 			<div className={ className }>
-				<h2>{ __( 'Call to Action', 'jsforwpblocks' ) }</h2>
+				{ isSelected &&
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlignment }
+						onChange={ newValue => setAttributes( { textAlignment: newValue } ) }
+					/>
+				</BlockControls>
+				}
 				<RichText
 					tagName="div"
 					multiline="p"
-					placeholder={ __( 'Add your custom message', 'jsforwpblocks' ) }
-					onChange={ newValue => setAttributes( { message: newValue } ) }
+					placeholder={ __( 'Enter your message here..', 'jsforwpblocks' ) }
 					value={ message }
+					style={ { textAlign: textAlignment } }
+					onChange={ message => setAttributes( { message } ) }
 				/>
 			</div>
 		);
 	},
 
 	save: props => {
-		const { attributes: { message } } = props;
+		const { textAlignment, message } = props.attributes;
 		return (
-			<div>
-				<h2>{ __( 'Call to Action', 'jsforwpblocks' ) }</h2>
-				<div className="message-body">
-					{ message }
-				</div>
+			<div className="message-body" style={ { textAlign: textAlignment } }>
+				{ message }
 			</div>
 		);
 	},
-},
-);
+} );
