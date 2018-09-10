@@ -7,16 +7,26 @@
 
 //  Import CSS.
 import classnames from 'classnames';
+import icon from './icon';
 import './style.scss';
+import './editor.scss';
 
 const { __ } = wp.i18n;
-const { registerBlockType } = wp.blocks;
+const {
+	registerBlockType,
+} = wp.blocks;
 const {
 	RichText,
 	AlignmentToolbar,
 	BlockControls,
 	BlockAlignmentToolbar,
 } = wp.editor;
+const {
+	Dashicon,
+	Toolbar,
+	Button,
+	Tooltip,
+} = wp.components;
 
 /**
  * Register: aa Gutenberg Block.
